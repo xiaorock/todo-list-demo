@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>todo-list</title>
+  <style>
+    .todo-item {
+      width: 100%;
+      display: flex;
+    }
+
+    .todo-item li {
+      text-decoration: line-through;
+    }
+
+    .todo-key li {
+      text-decoration: none;
+    }
+
+    .todo-focus {
+      border: 3px solid #bc99ff;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <input ref="input" type="text" v-model="text" placeholder="enter键直接输入" @keyup.enter="handleAdd($event)"
+      @keyup.down="handleDown($event)">
+    <ol>
+      <todo-item ref="list" v-for="(item,index) in message" @del="del" :todo="item,index" :key="item.name"></todo-item>
+    </ol>
+  </div>
+
+  <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script type="text/babel">
+    Vue.component('todo-item', {
+      props: ['todo', "index"],
+      template: `
+        <div :class="{'todo-item':todo.isDel,'todo-key':!todo.isDel,'todo-focus':todo.isFocus}" @keyup.down="handleLiDown(index)">
+          <li @click="handleDel(todo,index)">{{todo.name}}</li>
+        </div>
+      `,
+      methods: {
+        handleDel(todo, index) {
+          console.log(index)
+          this.$emit('del', todo);
+        }
+      }
+    })
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: [
+        ],
+        text: ""
+      },
+      methods: {
+        handleAdd() {
+          if (!this.text) {
+            alert("输入为空，请重新输入")
+            return
+          }
+          this.message.push({
+            isDel: false,
+            isFocus: false,
+            name: this.text
+          })
+          console.log(this.message)
+          this.text = '';
+        },
+        del(val) {
+          val.isDel = !val.isDel;
+        },
+        handleDown() {
+          console.log("执行向下操作列表")
+          this.message[0].isFocus = true;
+          this.$refs['input'].blur();
+          console.log(this.$refs['list'])
+          this.$refs['list'][0].fucus()
+
+        },
+        handleLiDown(index) {
+          console.log(index)
+          this.message[index + 1].isFocus = true;
+        }
+
+      }
+    })
+  </script>
+
+</body>
+
+</html>
